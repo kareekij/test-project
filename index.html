@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello world</title>
+   </head>
+
+   <script src = "/socket.io/socket.io.js"></script>
+   <script>
+      var socket = io();
+
+      socket.on('broadcast',function(data) {
+         document.getElementById('user_connected_count').innerHTML = data.description
+      });
+
+      var user;
+      socket.on('userExists', function(data) {
+         document.getElementById('error-container').innerHTML = data;
+         user = '';
+      });
+
+      socket.on('userSet', function(data) {
+        console.log(data)
+        if (!user){
+           user = data.username;
+        }
+
+
+         text = '--- Name --- <br>'
+         for (i=0;i<data.users_list.length; i++){
+           text += data.users_list[i]  + '<br>';
+         }
+
+          text += '------------ <br>'
+        ul = document.getElementById('users_list').innerHTML = text
+
+        if (isUserNameSet){
+          document.getElementById('div_main').innerHTML = '<input type = "text" id = "message">\
+           <button type = "button" name = "button" onclick = "sendMessage()">Send</button>\
+           <button type = "button" name = "button" onclick = "callAlert(toAll=true)">Trigger all</button>\
+           <button type = "button" name = "button" onclick = "callAlert(toAll=false)">Trigger </button>\
+           <div id = "message-container"></div>';
+        }
+
+      });
+
+      socket.on('newmsg', function(data) {
+         if(user) {
+            document.getElementById('message-container').innerHTML += '<div><b>' +
+               data.user + '</b>: ' + data.message + '</div>'
+         }
+      });
+
+      socket.on('alert', function(data){
+        console.log(data.user, user)
+        if (data.all == true){
+          triggerAlert();
+        }
+        else if (data.all == false && data.user != user){
+          triggerAlert();
+        }
+
+      });
+
+      function triggerAlert(){
+        document.getElementById('div_test').innerHTML += '==='
+      }
+
+      function sendMessage() {
+         var msg = document.getElementById('message').value;
+         if(msg) {
+            socket.emit('msg', {message: msg, user: user});
+         }
+      }
+
+      function callAlert(toAll=true){
+        console.log('alert ' +toAll)
+        socket.emit('triggerAlert', {user: user, all: toAll});
+      }
+
+      var isUserNameSet = false;
+      function setUsername() {
+         user = document.getElementById('name').value
+         socket.emit('setUsername', user);
+         isUserNameSet = true;
+
+      };
+   </script>
+
+   <body>
+      <div id="user_connected_count"></div>
+      <div id="users_list"></div>
+      <div id="error-container"></div>
+
+      <div id="div_main">
+        Put your name here:
+        <input id = "name" type = "text" name = "name" value = "" placeholder = "Enter your name!">
+
+        <button type = "button" name = "button" onclick = "setUsername()">
+          Enter
+        </button>
+
+      </div>
+      <div id="div_test"></div>
+
+   </body>
+</html>
