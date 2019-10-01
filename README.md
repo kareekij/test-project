@@ -16,12 +16,22 @@ node --version
 npm --version
 ```
 
-## Start Service
+## Start Service (Standalone Service)
 ```
-nodemon app.js
+nodemon app_standalone.js
 ```
 
-The server will run on `localhost:3000` by default
+The server will run on port `:3000` by default.
+
+An example of `client` code is in: `example.html`
+
+Please assign the variable `ip` to the ip address (in `example.html`)  of the machine that run `app_standalone.js`.
+
+```
+// TODO: change the ip-address to Socket.IO server
+ip = '192.168.0.198';
+var socket = io('http://'+ ip +':3000');
+```
 
 ## Some Basic Functionalities
 1. A client broadcasts message to other clients
@@ -39,4 +49,4 @@ Broadcasting: https://www.tutorialspoint.com/socket.io/socket.io_broadcasting.ht
 
 Rooms: https://www.tutorialspoint.com/socket.io/socket.io_rooms.htm
 
-Reference: https://www.tutorialspoint.com/socket.io/index.htm
+Reference: https://www.tutorialspoint.com/socket.io/index.htm, https://www.npmjs.com/package/socket.io
